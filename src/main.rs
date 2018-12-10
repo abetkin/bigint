@@ -1,6 +1,7 @@
 
 use std::io;
 use std::i32;
+use std::ops::Add;
 
 struct Number {
     chunks: Vec<i32>
@@ -8,32 +9,39 @@ struct Number {
 
 impl Number {
 
-    pub fn new(x: i32) -> Point {
-        Point{numbers: vec![x]}
+    fn new(x: i32) -> Number {
+        Number{chunks: vec![x]}
+    }
+
+    fn format(n: Number) -> String {
+        let chunks: Vec<_> = n.chunks.iter().map(|n| n.to_string()).collect();
+        chunks.join("")
     }
 }
 
 
 
-impl Add for Point {
-    pub fn add(self, other: Number) -> Number {
+impl Add for Number {
+    type Output = Number;
+
+    fn add(self, other: Number) -> Number {
         let pairs = self.chunks.iter().zip(other.chunks.iter());
-        let result = vec![];
-        let overflow = false;
-        for x1, x2 in pairs.iter() {
-            let sum = x1 + x2 as u32;
+        let mut result = vec![];
+        let mut overflow = false;
+        for (x1, x2) in pairs {
+            let mut sum = (x1 + x2) as u32;
             sum = if overflow {
                 sum + 1
             } else {
                 sum
-            }
-            overflow = sum > i32::MAX;
+            };
+            overflow = if sum > i32::MAX as u32 { true } else { false };
             sum = if overflow {
-                sum - i32::MAX
+                sum - (i32::MAX as u32)
             } else {
                 sum
-            } as i32;
-            result.push(v);
+            };
+            result.push(sum as i32);
         }
         Number{chunks: result}
     }
@@ -48,9 +56,8 @@ fn fibonacci_fast(n: i32) -> Number {
 }
 
 fn fib(n: i32) -> Number {
-    let mut prev = Number::new(0);
-    let mut next = Number::new(1);
-    for _i in 1..n {
+
+    let fib_raw = "array"; // FIXME
         let new_next = next + prev;
         prev = next;
         next = new_next;
@@ -62,7 +69,7 @@ fn main() {
     let mut input = String::new();
     std::io::stdin().read_line(&mut input);
     let n: i32 = input.trim().parse().unwrap();
-    print!("{}\n", fibonacci_fast(n))
+    print!("{}\n", Number::format(fibonacci_fast(n)))
 
 
 }
