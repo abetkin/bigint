@@ -13,22 +13,18 @@ impl Number {
         Number{chunks: vec![x]}
     }
 
-    fn format(n: Number) -> String {
-        let chunks: Vec<_> = n.chunks.iter().map(|n| n.to_string()).collect();
-        chunks.join("")
+    fn clone(&self) -> Number {
+        Number {
+            chunks: self.chunks.clone()
+        }
     }
 
-    fn equate_sizes(&mut self, &mut other: Number) {
-        let delta = (self.chunks.len() - other.chunks.len()) as i32;
-        if delta < 0 {
-            for i in 0..-delta {
-                self.chunks.push(0);
-            }
-        } else {
-            for i in 0..delta {
-                other.chunks.push(0);
-            }
-        }
+    fn format(n: Number) -> String {
+        let chunks: Vec<_> = n.chunks.iter().map(|n| n.to_string()).collect();
+        // FIXME
+        let mut reversed = chunks.clone();
+        reversed.reverse();
+        reversed.join(",")
     }
 }
 
@@ -38,49 +34,32 @@ impl Add for Number {
     type Output = Number;
 
     fn add(self, other: Number) -> Number {
-        let pairs = self.chunks.iter().zip(other.chunks.iter());
-        Number::equate_sizes(&mut self, other);
         let mut result = vec![];
         let mut overflow = false;
-        for (x1, x2) in pairs {
-            let mut sum = (x1 + x2) as u32;
-            sum = if overflow {
-                sum + 1
+        for (i, &val) in self.chunks.iter().enumerate() {
+            let mut sum = val as u32;
+            if let Some(other_val) = other.chunks.get(i) {
+                sum = (val + other_val) as u32;
+            }
+            if overflow {
+                sum += 1;
+            }
+            if sum > i32::MAX as u32 {
+                sum -= i32::MAX as u32;
+                overflow = true;
             } else {
-                sum
-            };
-            overflow = if sum > i32::MAX as u32 { true } else { false };
-            sum = if overflow {
-                sum - (i32::MAX as u32)
-            } else {
-                sum
-            };
+                overflow = false;
+            }
             result.push(sum as i32);
+        }
+        if other.chunks.len() > self.chunks.len() {
+            for &val in &other.chunks[self.chunks.len()..] {
+                result.push(val)
+            }
         }
         Number{chunks: result}
     }
 }
-
-// TODO how number is split in chunks?
-
-// fn fibonacci_fast(n: i32) -> Number {
-//     if n < 2 {
-//         Number::new(n)
-//     } else {
-//         fib(n)
-//     }
-// }
-
-// fn fib(n: i32) -> Number {
-//     // TODO
-//     let mut result: Vec<Number> = Vec::new();
-//     result.push(Number::new(0));
-//     result.push(Number::new(1));
-//     for i in 2 .. (n as usize) + 1 {
-//         result.push(result[i-1] + result[i-2]);
-//     }
-//     result[n as usize]
-// }
 
 fn test_sum() -> Number{
     let num1 = Number{
