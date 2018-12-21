@@ -26,14 +26,9 @@ impl Number {
         reversed.reverse();
         reversed.join(",")
     }
-}
 
-
-
-impl Add for Number {
-    type Output = Number;
-
-    fn add(self, other: Number) -> Number {
+    fn add_o(&self, other: &Number) -> Number {
+        
         let mut result = vec![];
         let mut overflow = false;
         for (i, &val) in self.chunks.iter().enumerate() {
@@ -51,6 +46,10 @@ impl Add for Number {
                 overflow = false;
             }
             result.push(sum as i32);
+            
+        }
+        if overflow {
+            result.push(1);
         }
         if other.chunks.len() > self.chunks.len() {
             for &val in &other.chunks[self.chunks.len()..] {
@@ -61,22 +60,38 @@ impl Add for Number {
     }
 }
 
-fn test_sum() -> Number{
-    let num1 = Number{
-        chunks: vec![0, 1, 2]
-    };
-    let num2 = Number {
-        chunks: vec![10]
-    };
-    num1 + num2
+fn fib(n: i32) -> Number {
+    if n < 2 {
+        return Number::new(n)
+    }
+    let n_pos = n as usize;
+    let mut result: Vec<Number> = vec![];
+    result.push(Number::new(0));
+    result.push(Number::new(1));
+    for i in 1..n_pos {
+        result.push(result[i-1].add_o(&result[i]))
+    }
+    result.pop().unwrap()
 }
 
+
+
+// fn test_sum() -> Number{
+//     let num1 = Number{
+//         chunks: vec![2000000000]
+//     };
+//     let num2 = Number {
+//         chunks: vec![2000000000]
+//     };
+//     num1 + num2
+// }
+
 fn main() {
-    // let mut input = String::new();
-    // std::io::stdin().read_line(&mut input);
-    // let n: i32 = input.trim().parse().unwrap();
-    // print!("{}\n", Number::format(fibonacci_fast(n)))
-    let x = test_sum();
-    print!("{}\n", Number::format(x));
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input);
+    let n: i32 = input.trim().parse().unwrap();
+    print!("{}\n", Number::format(fib(n)));
+    // let x = test_sum();
+    // print!("{}\n", Number::format(x));
 
 }
