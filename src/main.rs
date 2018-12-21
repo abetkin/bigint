@@ -74,6 +74,11 @@ fn fib(n: i32) -> Number {
     result.pop().unwrap()
 }
 
+/* fails:
+/ 1836311903 (46)
+/ 1,823731426 (47)
+/ 1,1,512559682 (48)
+*/
 
 
 // fn test_sum() -> Number{
