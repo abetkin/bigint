@@ -3,6 +3,8 @@ use std::io;
 use std::i32;
 use std::ops::Add;
 
+use std::fmt; 
+
 struct Number {
     chunks: Vec<i32>
 }
@@ -56,9 +58,25 @@ impl Number {
                 result.push(val)
             }
         }
+        if result.len() > 2 {
+            print!("self {}", self.chunks);
+            print!("other {}", other.chunks);
+        }
         Number{chunks: result}
     }
 }
+
+
+impl fmt::Display for Number {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let s: Vec<String> = vec![];
+        for c in self.chunks {
+            s.push(c.to_string())
+        }
+        write!(f, s.join(", "));
+    }
+}
+
 
 fn fib(n: i32) -> Number {
     if n < 2 {
